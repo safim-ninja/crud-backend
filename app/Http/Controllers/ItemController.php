@@ -10,15 +10,16 @@ class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::get();
-        return response($items);
+        // try{
+            $items = Item::latest()->get();
+            return response($items);
+        // } catch(Exception $e){
+        //     return response()->json('Items Not');
+        // }
     }
     public function store(Request $request)
     {
         try{
-            $request->validate([
-                'name' => 'required'
-            ]);
             Item::create([
                 'name' => $request->name,
                 'price' => $request->price ?? 0
@@ -27,7 +28,8 @@ class ItemController extends Controller
         }
         catch(Exception $e){
             // return response()->json($e);
-            return response()->json($request->all(), 500);
+            // dd($e);
+            return response()->json($e, 500);
         }
     }
     public function update(Request $request, $id)
