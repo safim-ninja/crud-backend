@@ -2,64 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Item;
 use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $items = Item::get();
+        return response($items);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        try{
+            $request->validate([
+                'name' => 'required'
+            ]);
+            Item::create([
+                'name' => $request->name,
+                'price' => $request->price ?? 0
+            ]);
+            return response()->json('Item created', 200);
+        }
+        catch(Exception $e){
+            // return response()->json($e);
+            return response()->json($request->all(), 500);
+        }
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Item $item)
+    public function update(Request $request, $id)
     {
-        //
+        try{
+            $item = Item::find($id);
+            $request->validate([
+                'name' => 'required'
+            ]);
+            $item->update([
+                'name' => $request->name,
+                'price' => $request->price ?? 0
+            ]);
+            return response()->json('Item Updated', 200);
+        }
+        catch(Exception $e){
+            // return response()->json($e);
+            return response()->json('Not Updated');
+        }
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Item $item)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Item $item)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Item $item)
-    {
-        //
+        try{
+            $item = Item::find($id);
+            $item->delete();
+            return response()->json('Deleted', 200);
+        } catch(Exception $e){
+            return response()->json('Not Deleted', 500);
+        }
     }
 }
